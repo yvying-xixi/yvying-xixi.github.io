@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ site.Title }}</title>
+</head>
+<body>
+  <h1>{{ site.Title }}</h1>
+  <p>欢迎来到我的个人笔记网站。</p>
+
+  <h2>笔记列表</h2>
+  <ul>
+    {{ range site.RegularPages }}
+      <li>
+        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+      </li>
+    {{ end }}
+  </ul>
+</body>
+</html>

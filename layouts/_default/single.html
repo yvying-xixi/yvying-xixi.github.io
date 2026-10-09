@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ .Title }} | {{ site.Title }}</title>
+</head>
+<body>
+  <nav>
+    <a href="{{ site.Home.RelPermalink }}">返回首页</a>
+  </nav>
+
+  <main>
+    <h1>{{ .Title }}</h1>
+    <p>{{ .Date.Format "2006-01-02" }}</p>
+    <article>
+      {{ .Content }}
+    </article>
+  </main>
+</body>
+</html>

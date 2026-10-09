@@ -1,0 +1,74 @@
+name: Build and Deploy Hugo Site
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout notes repository
+        uses: actions/checkout@v4
+
+      - name: Read Hugo commit SHA
+        id: hugo-sha
+        run: |
+          SHA="$(tr -d '[:space:]' < HUGO_COMMIT)"
+          if ! echo "$SHA" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "HUGO_COMMIT must contain a full 40-character Git SHA"
+            exit 1
+          fi
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout Hugo source
+        uses: actions/checkout@v4
+        with:
+          repository: gohugoio/hugo
+          ref: ${{ steps.hugo-sha.outputs.sha }}
+          path: hugo-src
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: hugo-src/go.mod
+          cache: true
+          cache-dependency-path: hugo-src/go.sum
+
+      - name: Build Hugo from source
+        working-directory: hugo-src
+        run: go build -o "$RUNNER_TEMP/hugo" .
+
+      - name: Build website
+        run: |
+          "$RUNNER_TEMP/hugo" \
+            --source . \
+            --destination public \
+            --minify
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
