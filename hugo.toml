@@ -1,3 +1,12 @@
 baseURL = "https://yvying-xixi.github.io/"
 languageCode = "zh-cn"
 title = "我的个人笔记"
+theme = "PaperMod"
+
+[params]
+defaultTheme = "auto"
+ShowReadingTime = true
+ShowCodeCopyButtons = true
+
+[markup.highlight]
+noClasses = false
